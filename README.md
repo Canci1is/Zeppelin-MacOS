@@ -1,60 +1,61 @@
 # ZeppelinBot-MacOS
-Use This Guide to self host Zeppelin STANDALONE on your Mac
-1. Go to https://code.visualstudio.com/download and download for Mac
-2. Go to https://www.docker.com/products/docker-desktop/ And download for Apple Sillicon.
-3. type `git clone https://github.com/ZeppelinBot/Zeppelin` (Make sure you can use github on your VSCode (Visual Studio Code) terminal.
-4. go to .env.example, and right click the file, click Rename and type in .env (erase .example)
-5. Fill in the Values under Standalone and General, Put in the vaules.
- ==========================
- GENERAL OPTIONS
- ==========================
 
- 32 character encryption key
-KEY= #use `openssl rand -hex 16` in your terminal,and copy paste the output.
+Use This Guide to self-host Zeppelin STANDALONE on your Mac
 
-Values from the Discord developer portal
+1. Go to https://code.visualstudio.com/download and download for Mac  
+2. Go to https://www.docker.com/products/docker-desktop/ and download for Apple Silicon  
+3. Type `git clone https://github.com/ZeppelinBot/Zeppelin` (Make sure you can use GitHub on your VSCode terminal.)  
+4. Then type:  
+`cd Zeppelin`  
+5. Go to `.env.example`, right-click the file, click Rename and type in `.env` (erase `.example`)  
+6. Fill in the values under **Standalone** and **General**:
 
-CLIENT_ID= Get the Client id
-CLIENT_SECRET= Reset and get the Client Secret
-BOT_TOKEN= Get the Bot Token
-
- The defaults here automatically work for the development environment.
- For production, change localhost:3300 to your domain.
-DASHBOARD_URL=http://localhost:80
-API_URL=http://localhost:80/api
-
- Comma-separated list of user IDs who should have access to the bot's global commands
-STAFF= #add user ids for who will have access to the global commands (you will know later)
-
- A comma-separated list of server IDs that should be allowed by default
-DEFAULT_ALLOWED_SERVERS= #Server IDs for which servers Zeppelin will be used in
-
- Only required if relevant feature is used
-#FISHFISH_API_KEY= #fishfish API key (idk this)
-
-#DEFAULT_SUCCESS_EMOJI= #put the success emoji
-#DEFAULT_ERROR_EMOJI= #put the error emoji
-
-
- ==========================
- PRODUCTION - STANDALONE
-NOTE: You only need to fill in these values for running the standalone production environment
+==========================
+GENERAL OPTIONS  
 ==========================
 
-STANDALONE_WEB_PORT=80
+**32 character encryption key**  
+KEY=  # Paste output from `openssl rand -hex 16`
 
- The MySQL database running in the container is exposed to the host on this port,
- allowing access with database tools such as DBeaver
-STANDALONE_MYSQL_PORT=3356
- Password for the Zeppelin database user
-STANDALONE_MYSQL_PASSWORD= (set to any password you want but make it secure)
- Password for the MySQL root user
-STANDALONE_MYSQL_ROOT_PASSWORD= (Same password as above)
+Values from the Discord Developer Portal:  
+CLIENT_ID=  # Get the Client ID  
+CLIENT_SECRET=  # Reset and get the Client Secret  
+BOT_TOKEN=  # Get the Bot Token  
 
-Now we need to alter docker-compose.standalone.yml 
-To make it work for MacOS.
-just copy paste this:
-`version: '3'
+The defaults here automatically work for the development environment.  
+For production, change localhost:3300 to your domain.  
+DASHBOARD_URL=http://localhost:80  
+API_URL=http://localhost:80/api  
+
+Comma-separated list of user IDs who should have access to the bot's global commands  
+STAFF=  # Add user IDs who will have access to global commands  
+
+Comma-separated list of server IDs that should be allowed by default  
+DEFAULT_ALLOWED_SERVERS=  # Server IDs to use Zeppelin in  
+
+Only required if relevant features are used:  
+#FISHFISH_API_KEY=  
+#DEFAULT_SUCCESS_EMOJI=  
+#DEFAULT_ERROR_EMOJI=  
+
+==========================
+PRODUCTION - STANDALONE  
+NOTE: You only need to fill in these values for running the standalone production environment  
+==========================
+
+STANDALONE_WEB_PORT=80  
+
+The MySQL database running in the container is exposed to the host on this port,  
+allowing access with database tools such as DBeaver  
+STANDALONE_MYSQL_PORT=3356  
+STANDALONE_MYSQL_PASSWORD=  # Set to any secure password  
+STANDALONE_MYSQL_ROOT_PASSWORD=  # Same as above
+
+Now we need to alter `docker-compose.standalone.yml` to make it work for macOS.  
+Just copy and paste this:
+
+```
+version: '3'
 name: zeppelin-prod
 
 volumes:
@@ -145,13 +146,20 @@ services:
     env_file:
       - .env
     working_dir: /zeppelin/dashboard
-    command: ["node", "serve.js"]`
+    command: ["node", "serve.js"]
+```
 
-  #What does this do? It makes Docker emulate linux environments, and if you don't change the code, it will say platform errors, because MacOS is ARM-64 but the code is expecting AMD-86.
- **NOW, LOGIN TO DOCKER DESKTOP**
-**now go to `docker/production/nginx/default.conf` and paste this code**
-`server {
-listen 80;
+# What does this do?  
+It makes Docker emulate a Linux environment.  
+If you don’t change the platform, it will show errors — because macOS is ARM64 but Zeppelin expects AMD64.
+
+**NOW, LOGIN TO DOCKER DESKTOP**
+
+Now go to `docker/production/nginx/default.conf` and paste this code:
+
+```
+server {
+  listen 80;
   listen 443 ssl http2;
   listen [::]:443 ssl http2;
   server_name _;
@@ -184,13 +192,44 @@ listen 80;
 
   ssl_protocols TLSv1.3;
   ssl_prefer_server_ciphers off;
-  
-**NEXT**, go to https://discord.com/developers/applications and Go to your bot, go to OAuth2 and click Add Redirct and type in `http://localhost:80/api/auth/oauth-callback`
-**Now. we are going to run the code**
-Type in `docker-compose -f docker-compose.standalone.yml up -d --build` in the terminal. wait until everything is Healthy, created, or running. (MAKE SURE SAFARI HAS DONT WARN HTTP (INSECURE WEBSITES)
-Now go to http://localhost:80 (allow docker on firewall protection if it doenst work) 
-Now, Go to https://setuptoolzep.github.io
-Put in all the values, and copy oaste onto the Config. Find all other commands and things from https://zeppelin.wiki/  **AND FROM**  https://zeppelin.gg/docs
-That's it for now. Bye, wish you good luck. To get support, join the server https://discord.com/invite/UeTCfaK 
-and ask for help.
-Made with a lot of time by `invalidsyntaxerror`.
+}
+```
+
+### NEXT:  
+Go to https://discord.com/developers/applications → your bot → OAuth2 → Add Redirect →  
+`http://localhost:80/api/auth/oauth-callback`
+
+### Make sure Docker is open, click to start the app. if you close it, the code will stop.
+
+### NOW: Run the code.
+
+Type this in your terminal:
+
+```
+docker-compose -f docker-compose.standalone.yml up -d --build
+```
+
+Wait until everything says `Healthy`, `Created`, or `Running`.  
+(Make sure Safari allows insecure websites or HTTP if it doesn't load.)
+
+Then go to:  
+http://localhost:80
+
+If it doesn’t work, allow Docker through macOS firewall.
+
+Now go to:  
+https://setuptoolzep.github.io — fill in the values, copy the config output, and paste into your dashboard server config.
+See more command setup at:  
+https://zeppelin.wiki/  
+and  
+https://zeppelin.gg/docs
+
+If you want to run your code without your parents noticing, first set brightness to lowest, though it still has little bit of brightness on, so type ```caffeinate -d -i -m -u & sleep 4; pmset displaysleepnow``` IN YOUR TERMINAL APP, NOT VSCode TERMINAL. Quickly, turn off your keyboard and mouse, and it wikk automatically black out the screen, but dont worrym the -d is for Detached, which runs in the background, and this allows it to run in background. If you press anything or move your cursor, the screen will turn on again, BUT THIS IS ONLY SCREEN SLEEPING WITH CODE RUNNING. THE SYSTEM ISN'T OFF.
+---
+
+That's it.  
+Good luck, and for help, join the support server:  
+https://discord.com/invite/UeTCfaK
+
+
+Made with a lot of time by `invalidsyntaxerror`. 

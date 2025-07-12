@@ -149,4 +149,5 @@ services:
 
   #What does this do? It makes Docker emulate linux environments, and if you don't change the code, it will say platform errors, because MacOS is ARM-64 but the code is expecting AMD-86.
  **NOW, LOGIN TO DOCKER DESKTOP**
-now go to 
+now go to `docker/production/nginx/default.conf` and paste this code
+`

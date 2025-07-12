@@ -150,4 +150,38 @@ services:
   #What does this do? It makes Docker emulate linux environments, and if you don't change the code, it will say platform errors, because MacOS is ARM-64 but the code is expecting AMD-86.
  **NOW, LOGIN TO DOCKER DESKTOP**
 now go to `docker/production/nginx/default.conf` and paste this code
-`
+`server {
+
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+  server_name _;
+
+  # Using a variable here stops nginx from crashing if the dev container is restarted or becomes otherwise unavailable
+  set $backend_upstream "http://api:3001";
+  set $dashboard_upstream "http://dashboard:3002";
+
+  location / {
+    # Using a variable in proxy_pass also requires resolver to be set.
+    # This is the address of the internal docker compose DNS server.
+    resolver 127.0.0.11;
+    proxy_pass $dashboard_upstream$uri$is_args$args;
+  }
+
+  location /api {
+    resolver 127.0.0.11;
+    proxy_pass $backend_upstream$uri$is_args$args;
+    proxy_redirect off;
+
+    client_max_body_size 200M;
+  }
+
+  ssl_certificate /etc/ssl/certs/localhost-cert.pem;
+  ssl_certificate_key /etc/ssl/private/localhost-cert.key;
+
+  ssl_session_timeout 1d;
+  ssl_session_cache shared:MozSSL:10m;
+  ssl_session_tickets off;
+
+  ssl_protocols TLSv1.3;
+  ssl_prefer_server_ciphers off;
+}

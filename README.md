@@ -54,4 +54,84 @@ STANDALONE_MYSQL_ROOT_PASSWORD= (Same password as above)
 Now we need to alter docker-compose.standalone.yml 
 To make it work for MacOS.
 just copy paste this:
-`
+`version: "3.8"
+
+services:
+  mysql:
+    platform: linux/amd64
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zeppelin
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    platform: linux/amd64
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    command: npm run migrate-prod
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  bot:
+    platform: linux/amd64
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    command: npm run start-bot-prod
+    depends_on:
+      - migrate
+
+  api:
+    platform: linux/amd64
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    command: npm run start-api-prod
+    depends_on:
+      - migrate
+
+  dashboard:
+    platform: linux/amd64
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    command: npm run start-prod
+    depends_on:
+      - api
+
+  nginx:
+    platform: linux/amd64
+    image: nginx
+    ports:
+      - "3000:443"
+    volumes:
+      - ./docker/production/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/production/certs:/etc/ssl/certs
+      - ./docker/production/private:/etc/ssl/private
+    depends_on:
+      - dashboard
+      - api
+
+volumes:
+  mysql-data:`
+
+  #What does this do? It makes Docker emulate linux environments, and if you don't change the code, it will say platform errors, because MacOS is ARM-64 but the code is expecting AMD-86.
+  Nowm we

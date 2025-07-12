@@ -54,84 +54,98 @@ STANDALONE_MYSQL_ROOT_PASSWORD= (Same password as above)
 Now we need to alter docker-compose.standalone.yml 
 To make it work for MacOS.
 just copy paste this:
-`version: "3.8"
+`version: '3'
+name: zeppelin-prod
+
+volumes:
+  mysql-data:
 
 services:
   mysql:
-    platform: linux/amd64
-    image: mysql:8
-    restart: always
+    image: mysql:8.0
+    platform: linux/amd64   # <-- platform tweak here
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${STANDALONE_MYSQL_ROOT_PASSWORD:?Missing STANDALONE_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: zeppelin
+      MYSQL_USER: zeppelin
+      MYSQL_PASSWORD: ${STANDALONE_MYSQL_PASSWORD:?Missing STANDALONE_MYSQL_PASSWORD}
+    ports:
+      - 127.0.0.1:${STANDALONE_MYSQL_PORT:?Missing STANDALONE_MYSQL_PORT}:3306
     volumes:
       - mysql-data:/var/lib/mysql
+    command:
+      - "--skip-log-bin"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
+      test: ["CMD", "/usr/bin/mysql", "--host=127.0.0.1", "--user=root", "--password=${STANDALONE_MYSQL_ROOT_PASSWORD}", "--execute", "SHOW DATABASES;"]
+      interval: 1s
       timeout: 5s
-      retries: 5
+      retries: 60
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/production/nginx/Dockerfile
+    platform: linux/amd64   # <-- platform tweak here
+    ports:
+      - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:443"
 
   migrate:
-    platform: linux/amd64
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-    command: npm run migrate-prod
+    image: dragory/zeppelin
+    platform: linux/amd64   # <-- platform tweak here
     depends_on:
       mysql:
         condition: service_healthy
-
-  bot:
-    platform: linux/amd64
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-    command: npm run start-bot-prod
-    depends_on:
-      - migrate
+    environment: &env
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=zeppelin
+      - DB_PASSWORD=${STANDALONE_MYSQL_PASSWORD}
+      - DB_DATABASE=zeppelin
+      - API_PATH_PREFIX=/api
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "migrate-prod"]
 
   api:
-    platform: linux/amd64
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-    command: npm run start-api-prod
+    image: dragory/zeppelin
+    platform: linux/amd64   # <-- platform tweak here
     depends_on:
-      - migrate
+      migrate:
+        condition: service_completed_successfully
+    restart: on-failure
+    environment: *env
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-api-prod"]
+
+  bot:
+    image: dragory/zeppelin
+    platform: linux/amd64   # <-- platform tweak here
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: on-failure
+    environment: *env
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-bot-prod"]
 
   dashboard:
-    platform: linux/amd64
-    build:
-      context: ./dashboard
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-    command: npm run start-prod
+    image: dragory/zeppelin
+    platform: linux/amd64   # <-- platform tweak here
     depends_on:
-      - api
-
-  nginx:
-    platform: linux/amd64
-    image: nginx
-    ports:
-      - "3000:443"
-    volumes:
-      - ./docker/production/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./docker/production/certs:/etc/ssl/certs
-      - ./docker/production/private:/etc/ssl/private
-    depends_on:
-      - dashboard
-      - api
-
-volumes:
-  mysql-data:`
+      migrate:
+        condition: service_completed_successfully
+    restart: on-failure
+    environment: *env
+    env_file:
+      - .env
+    working_dir: /zeppelin/dashboard
+    command: ["node", "serve.js"]`
 
   #What does this do? It makes Docker emulate linux environments, and if you don't change the code, it will say platform errors, because MacOS is ARM-64 but the code is expecting AMD-86.
   Nowm we

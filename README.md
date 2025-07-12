@@ -190,3 +190,7 @@ listen 80;
 Type in `docker-compose -f docker-compose.standalone.yml up -d --build` in the terminal. wait until everything is Healthy, created, or running. (MAKE SURE SAFARI HAS DONT WARN HTTP (INSECURE WEBSITES)
 Now go to http://localhost:80 (allow docker on firewall protection if it doenst work) 
 Now, Go to https://setuptoolzep.github.io
+Put in all the values, and copy oaste onto the Config. Find all other commands and things from https://zeppelin.wiki/  **AND FROM**  https://zeppelin.gg/docs
+That's it for now. Bye, wish you good luck. To get support, join the server https://discord.com/invite/UeTCfaK 
+and ask for help.
+Made with a lot of time by `invalidsyntaxerror`.

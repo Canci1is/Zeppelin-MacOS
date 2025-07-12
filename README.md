@@ -20,8 +20,8 @@ BOT_TOKEN= Get the Bot Token
 
  The defaults here automatically work for the development environment.
  For production, change localhost:3300 to your domain.
-DASHBOARD_URL=https://localhost:3300
-API_URL=https://localhost:3300/api
+DASHBOARD_URL=https://localhost:80
+API_URL=https://localhost:80/api
 
  Comma-separated list of user IDs who should have access to the bot's global commands
 STAFF= #add user ids for who will have access to the global commands (you will know later)
@@ -185,4 +185,6 @@ listen 80;
   ssl_protocols TLSv1.3;
   ssl_prefer_server_ciphers off;
 }
-**Now. we are going to run
+**NEXT, go to 
+**Now. we are going to run the code**
+Type in `docker-compose -f docker-compose.standalone.yml up -d --build` in the terminal. wait until everything is Healthy, created, or running. (MAKE SURE SAFARI HAS DONT WARN HTTP (INSECURE WEBSITES)

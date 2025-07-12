@@ -10,7 +10,7 @@ Use This Guide to self host Zeppelin STANDALONE on your Mac
  ==========================
 
  32 character encryption key
-KEY= #use `openssl rand -hex 16openssl rand -hex 16` in your terminal,and copy paste the output.
+KEY= #use `openssl rand -hex 16` in your terminal,and copy paste the output.
 
 Values from the Discord developer portal
 
@@ -20,8 +20,8 @@ BOT_TOKEN= Get the Bot Token
 
  The defaults here automatically work for the development environment.
  For production, change localhost:3300 to your domain.
-DASHBOARD_URL=https://localhost:80
-API_URL=https://localhost:80/api
+DASHBOARD_URL=http://localhost:80
+API_URL=http://localhost:80/api
 
  Comma-separated list of user IDs who should have access to the bot's global commands
 STAFF= #add user ids for who will have access to the global commands (you will know later)

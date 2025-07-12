@@ -184,7 +184,7 @@ listen 80;
 
   ssl_protocols TLSv1.3;
   ssl_prefer_server_ciphers off;
-}
-**NEXT, go to https://discord.com/developers/applications and Go to your bot, go to OAUTH2
+  
+**NEXT, go to https://discord.com/developers/applications and Go to your bot, go to OAuth2 and click Add Redirct and type in `http://localhost:80/api/auth/oauth-callback`
 **Now. we are going to run the code**
 Type in `docker-compose -f docker-compose.standalone.yml up -d --build` in the terminal. wait until everything is Healthy, created, or running. (MAKE SURE SAFARI HAS DONT WARN HTTP (INSECURE WEBSITES)

@@ -53,3 +53,5 @@ STANDALONE_MYSQL_ROOT_PASSWORD= (Same password as above)
 
 Now we need to alter docker-compose.standalone.yml 
 To make it work for MacOS.
+just copy paste this:
+`

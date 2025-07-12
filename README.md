@@ -87,7 +87,7 @@ services:
       dockerfile: docker/production/nginx/Dockerfile
     platform: linux/amd64   # <-- platform tweak here
     ports:
-      - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:443"
+      - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:80"
 
   migrate:
     image: dragory/zeppelin
@@ -185,3 +185,4 @@ listen 80;
   ssl_protocols TLSv1.3;
   ssl_prefer_server_ciphers off;
 }
+**Now. we are going to run

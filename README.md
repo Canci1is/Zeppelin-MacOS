@@ -1,4 +1,4 @@
-# Zeppelin-MacOS-zeppelin-guide
+# ZeppelinBot-MacOS
 Use This Guide to self host Zeppelin STANDALONE on your Mac
 1. Go to https://code.visualstudio.com/download and download for Mac
 2. Go to https://www.docker.com/products/docker-desktop/ And download for Apple Sillicon.
@@ -148,4 +148,5 @@ services:
     command: ["node", "serve.js"]`
 
   #What does this do? It makes Docker emulate linux environments, and if you don't change the code, it will say platform errors, because MacOS is ARM-64 but the code is expecting AMD-86.
-  Nowm we
+ **NOW, LOGIN TO DOCKER DESKTOP**
+now go to 

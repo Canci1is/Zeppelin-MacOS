@@ -1,4 +1,4 @@
-# ZeppelinBot-MacOS
+# ZeppelinBot-Selfhosting
 
 Use This Guide to self-host Zeppelin STANDALONE on your Mac
 
